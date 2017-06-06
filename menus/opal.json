@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle opal",
+        "command": "opal:toggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "opal",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "opal:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
