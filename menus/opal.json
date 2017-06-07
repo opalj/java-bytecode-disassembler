@@ -1,8 +1,8 @@
 {
   "context-menu": {
-    "atom-text-editor": [
+    ".tree-view .name": [
       {
-        "label": "Toggle opal",
+        "label": "Opal-Disassemble",
         "command": "opal:toggle"
       }
     ]
