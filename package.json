@@ -5,7 +5,7 @@
   "description": "A short description of your package",
   "keywords": [],
   "activationCommands": {
-    "atom-workspace": "opal:toggle"
+    "atom-workspace": "opal:disassemble"
   },
   "repository": "https://github.com/atom/opal",
   "license": "MIT",
