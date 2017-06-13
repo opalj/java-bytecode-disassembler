@@ -1,13 +1,13 @@
 {
-  "name": "opal",
-  "main": "./lib/opal",
-  "version": "0.0.0",
-  "description": "A short description of your package",
+  "name": "Java-Bytecode-Disassembler",
+  "main": "./lib/opal-atom",
+  "version": "0.0.1",
+  "description": "Easily disassemble your java bytecode with the OPAL Java Bytecode Disassembler for a one-to-one representation of the class file.",
   "keywords": [],
   "activationCommands": {
-    "atom-workspace": "opal:disassemble"
+    "atom-workspace": "opal-atom:disassemble"
   },
-  "repository": "https://github.com/atom/opal",
+  "repository": "https://github.com/atom/opal-atom",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"

@@ -3,7 +3,7 @@
     ".tree-view .name": [
       {
         "label": "Opal-Disassemble",
-        "command": "opal:disassemble"
+        "command": "opal-atom:disassemble"
       }
     ]
   },
@@ -16,11 +16,11 @@
           "submenu": [
             {
               "label": "Settings",
-              "command": "opal:help"
+              "command": "opal-atom:settings"
             },
             {
               "label": "Help",
-              "command": "opal:help"
+              "command": "opal-atom:help"
             }
           ]
         }
