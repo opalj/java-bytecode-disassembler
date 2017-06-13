@@ -6,7 +6,7 @@ For more information on the OPAL project, visit [opal-project.de](http://www.opa
 
 ## Getting Started
 
-You can install the package from the atom editor by searching for "TBD" or manually by downloading/cloning this repository.
+Currently you can only install the package manually by downloading/cloning this repository and following the instructions below.
 
 ### Installing
 
