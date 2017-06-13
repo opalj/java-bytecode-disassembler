@@ -2,7 +2,7 @@
 
 A package for the Atom editor which enables you to easily run the OPAL Java Bytecode Disassembler on your java bytecode for a one-to-one representation of the class file directly from the Atom editor.
 
-For more information on the OPAL project, visit [LICENSE.md](http://www.opal-project.de/).
+For more information on the OPAL project, visit [opal-project.de](http://www.opal-project.de/).
 
 ## Getting Started
 
