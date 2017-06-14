@@ -28,6 +28,10 @@ Link to Atom's packages (from project's folder)
 apm link
 ```
 
+### Usage
+
+To use the package simply right-click on a .class file in the tree-view and click on Opal-Disassemble. This should open a new tab with the disassembled view.
+
 ## Authors
 
 * **Nicolas Morew**
