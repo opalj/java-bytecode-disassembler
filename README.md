@@ -8,6 +8,10 @@ For more information on the OPAL project, visit [opal-project.de](http://www.opa
 
 Currently you can only install the package manually by downloading/cloning this repository and following the instructions below.
 
+### Requirements
+
+Make sure you have the latest version of Atom installed. The plugin has been tested with version 1.18.0
+
 ### Installing
 
 Clone the repository to your system
