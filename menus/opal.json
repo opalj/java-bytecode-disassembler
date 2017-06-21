@@ -1,6 +1,6 @@
 {
   "context-menu": {
-    ".tree-view .file > .name": [
+    ".tree-view .file": [
       {
         "label": "Opal-Disassemble",
         "command": "opal-atom:disassemble"
