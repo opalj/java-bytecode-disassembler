@@ -1,6 +1,6 @@
 {
   "context-menu": {
-    ".tree-view .name": [
+    ".tree-view .file > .name": [
       {
         "label": "Opal-Disassemble",
         "command": "opal-atom:disassemble"
@@ -12,15 +12,11 @@
       "label": "Packages",
       "submenu": [
         {
-          "label": "opal",
+          "label": "Java Bytecode Disassembler",
           "submenu": [
             {
               "label": "Settings",
               "command": "opal-atom:settings"
-            },
-            {
-              "label": "Help",
-              "command": "opal-atom:help"
             }
           ]
         }
