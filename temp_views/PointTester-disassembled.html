@@ -1,0 +1,3760 @@
+<html>
+            <head>
+                <title>Java Bytecode of PointTester</title>
+                <style type="text/css">
+/* 
+html5doctor.com Reset Stylesheet
+v1.6.1
+Last Updated: 2010-09-17
+Author: Richard Clark - http://richclarkdesign.com 
+Twitter: @rich_clark
+*/
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+body {
+    line-height:1;
+}
+
+article,aside,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section { 
+    display:block;
+}
+
+nav ul {
+    list-style:none;
+}
+
+blockquote, q {
+    quotes:none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content:'';
+    content:none;
+}
+
+a {
+    margin:0;
+    padding:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+table {
+	font-weight: inherit;
+	font-size: inherit;
+	font-variant: inherit;
+	font-style: inherit;
+}
+
+/* change colours to suit your needs */
+ins {
+    background-color:#ff9;
+    color:#000;
+    text-decoration:none;
+}
+
+/* change colours to suit your needs */
+mark {
+    background-color:#ff9;
+    color:#000; 
+    font-style:italic;
+    font-weight:bold;
+}
+
+del {
+    text-decoration: line-through;
+}
+
+abbr[title], dfn[title] {
+    border-bottom:1px dotted;
+    cursor:help;
+}
+
+table {
+    border-collapse:collapse;
+    border-spacing:0;
+}
+
+/* change border colour to suit your needs */
+hr {
+    display:block;
+    height:1px;
+    border:0;   
+    border-top:1px solid #cccccc;
+    margin:1em 0;
+    padding:0;
+}
+
+input, select {
+    vertical-align:middle;
+}</style>
+                
+                <link rel="stylesheet" href="/home/nicolas/Projects/opal-atom/lib/../disassembler-styles/disassembledView.css"></link>
+                <script>/* BSD 2-Clause License:
+ * Copyright (c) 2009 - 2014
+ * Software Technology Group
+ * Department of Computer Science
+ * Technische Universität Darmstadt
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *  - Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+"use strict";
+
+NodeList.prototype.forEach = Array.prototype.forEach;
+
+function toogleFilter() {
+ var flagsFilter = document.querySelectorAll('input:checked[type="checkbox"],input:checked[type="radio"]');
+ var nameFilter = document.querySelector('input[type="text"]').value
+ if(flagsFilter.length == 0 && nameFilter.length == 0) {
+	 // clear filter property
+	 document.querySelectorAll('div[class="method"]').forEach(function(e){e.style.display = 'block'})
+ } else {
+	 // 1. hide all
+	 document.querySelectorAll("div[class='method']").forEach(function(e){e.style.display = 'none'})
+
+	 var filterString = "div[class='method']"
+	 flagsFilter.forEach(function(e){filterString += "[data-access-flags*='"+e.value+"']"});
+	 if(nameFilter.length > 0)
+		 filterString += "[data-name*='"+document.querySelector('input[type="text"]').value+"']";
+
+	 // 2. show filtered
+	 console.log(filterString);
+	 document.querySelectorAll(filterString).forEach(function(e){e.style.display = 'block'})
+ }
+ toggleUnusedFlags();
+}
+
+function clearFilter(){
+	// clear flags filter
+	var flagsFilter = document.querySelectorAll('input:checked[type="checkbox"],input:checked[type="radio"]');
+	flagsFilter.forEach(function(f){f.checked = false});
+
+	// clear name filter
+	document.querySelectorAll('input[type="text"]').forEach(function(e){e.value = ""})
+
+	// update "view"
+	toogleFilter();
+}
+
+function toggleUnusedFlags() {
+	// sets the input element on disabled and puts a corresponding color on its label
+	var disableInput = function(element, disable) {
+		element.disabled = disable;
+		var label = document.querySelector('label[for="'+ element.id +'"]');
+		if (disable)
+			label.style.color = "lightgray";
+		else
+			label.style.color = "black";
+	}
+    var possibleFlags = document.querySelectorAll('input:not(:checked)[type="checkbox"],input:not(:checked)[type="radio"]');
+	var selectedFlags = document.querySelectorAll('input:checked[type="checkbox"],input:checked[type="radio"]');
+
+	var filterString = "div[class='method']"
+	selectedFlags.forEach(function(e){filterString += "[data-access-flags*='"+e.value+"']"});
+
+    possibleFlags.forEach(function (e) {
+		if (e.type == "radio") {
+			// on radio types, we have to filter the currently set radio-button in the same set as they are mutually exclusive
+			filterString = "div[class='method']"
+			selectedFlags.forEach(function(f){
+				if (e.name != f.name)
+					filterString += "[data-access-flags*='"+f.value+"']";
+			});
+		}
+		var possibleElements = document.querySelectorAll(filterString + "[data-access-flags*='"+ e.value +"']").length;
+		if (possibleElements > 0)
+			disableInput(e, false);
+		else
+			disableInput(e, true);
+    });
+}
+
+/**
+ * Trims the package names of classes that are on the same package-path
+ * as the disassembled class. Each match is replaced by a dot.
+ *
+ * Examples with java.awt.event.ActionEvent as disassembled class:
+ * 		java.awt.event.InputEvent -> ...InputEvent
+ *	 	java.awt.font.GraphicAttribute -> ..font.GraphicAttribute
+ * 		org.opalj.SomeClass -> org.opalj.SomeClass
+*/
+function trimPackageNames() {
+	// get defining class name and split for packages
+	var definingClassNameFQN = document.querySelector("#defining_class").innerHTML;
+	var definingPackages = definingClassNameFQN.split(".");
+	// splice removes the class name from the package array and returns it:
+	var definingClassName = definingPackages.splice(definingPackages.length-1);
+
+	for(var i=1;i<definingPackages.length;i++) {
+		definingPackages[i] = definingPackages[i-1] + "." + definingPackages[i];
+	}
+	document.querySelectorAll(".fqn").forEach(function(e) {
+		for(var i=definingPackages.length-1;i>=0;i--) {
+			while (e.innerHTML.indexOf(definingPackages[i]+".") >= 0) {
+				e.innerHTML = e.innerHTML.replace(definingPackages[i], new Array(i + 1).join( "." ));
+				e.title = definingPackages[i] + ".";
+			}
+		}
+	});
+}
+
+
+/**
+ * Removes the exception name from the exceptions overview if the containing element
+ * (span) would overlap to the next section of the document.
+ */
+function removeLongExceptionNames() {
+
+	var exceptions = document.querySelectorAll('td.exception');
+	exceptions.forEach(function(e) {
+		var span = e.querySelector('span');
+		if (span != null) {
+			var tbody = span.parentNode.parentNode.parentNode;
+
+			// if the totalOffset+width of the span is greater than totalOffset+height of
+			// the table body it would overlap to the next section (exception table)
+			if (totalOffset(span).top+span.clientWidth > totalOffset(tbody).top+tbody.clientHeight) {
+				span.innerHTML = span.getAttribute("data-exception-index") + ': ...';
+			}
+			if (totalOffset(span).top+span.clientWidth > totalOffset(tbody).top+tbody.clientHeight) {
+				span.innerHTML = span.getAttribute("data-exception-index") + ':';
+			}
+		}
+	});
+}
+
+/**
+ * Computes the offset of an HTMLElement from the top/left corner of the document
+ * in contrast to HTMLElement.offsetLeft/offsetTop which computes the offset relative
+ * to their HTMLElement.offsetParent node.
+ */
+function totalOffset(elem) {
+	if(!elem) elem = this;
+
+	var x = elem.offsetLeft;
+	var y = elem.offsetTop;
+
+	while (elem = elem.offsetParent) {
+		x += elem.offsetLeft;
+		y += elem.offsetTop;
+	}
+
+	return { left: x, top: y };
+}
+
+
+/**
+ * Removes (too) long exception names. This is a callback function that is called when
+ * a details.method_body is set to open, i.e. the methods instructions can be seen.
+ */
+function executeOnMethodBodyOpen() {
+	removeLongExceptionNames();
+}
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    toggleUnusedFlags();
+	trimPackageNames();
+
+	// adds a listener to details.method_body that is called when its attributes change
+	var targets = document.querySelectorAll('details.method_body');
+	var observer = new MutationObserver(function(mutations) {
+		executeOnMethodBodyOpen();
+	});
+	var config = { attributes: true, childList: false, characterData: false};
+	targets.forEach(function(target) {
+		observer.observe(target, config);
+	});
+});
+</script>
+                
+            </head>
+            <body>
+                <div id="class_file">
+                    <span class="access_flags">class</span>
+                    &nbsp;<b id="defining_class">PointTester</b>
+                    &nbsp;<span class="extends">extends <span class="super_class type">java.lang.Object</span></span>
+                    <div id="class_file_version">
+                        Version:&nbsp;52.0 (Java 8)
+                    </div>
+                    <div>
+                        Size:&nbsp;1565
+                        bytes
+                    </div>
+                </div>
+                <div class="constant_pool">
+                    <details>
+                        <summary>Constant Pool</summary>
+                        <ol class="cp_entries"><li value="1"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=34
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=66
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/Object</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=43
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=35
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">&lt;init&gt;</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=36
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="2"><span class="cp_entry">
+            CONSTANT_Class_info(name_index=44
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="3"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=2
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=44
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=43
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=35
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">&lt;init&gt;</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=36
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="4"><div class="cp_entry">
+            CONSTANT_Fieldref_info
+            (<div class="cp_ref">
+                 class_index=45
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=67
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/System</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=46
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=68
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">out</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=69
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Ljava/io/PrintStream;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="5"><span class="cp_entry">
+            CONSTANT_Class_info(name_index=47
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/StringBuilder</span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="6"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=5
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=47
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/StringBuilder</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=43
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=35
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">&lt;init&gt;</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=36
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="7"><span class="cp_entry">
+            CONSTANT_String_info(string_index=48
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">pt1 = </span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="8"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=5
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=47
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/StringBuilder</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=49
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=70
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">append</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=71
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/String;)Ljava/lang/StringBuilder;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="9"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=5
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=47
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/StringBuilder</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=50
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=70
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">append</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=72
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/Object;)Ljava/lang/StringBuilder;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="10"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=5
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=47
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/StringBuilder</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=51
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=73
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">toString</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=74
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()Ljava/lang/String;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="11"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=52
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=75
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/io/PrintStream</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=53
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=76
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">println</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=77
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/String;)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="12"><span class="cp_entry">
+            CONSTANT_Double_info(
+            <span class="constant_value">4.0d</span>
+            )
+        </span></li><li value="14"><span class="cp_entry">
+            CONSTANT_Double_info(
+            <span class="constant_value">3.0d</span>
+            )
+        </span></li><li value="16"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=2
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=44
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=54
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=35
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">&lt;init&gt;</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=78
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(DD)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="17"><span class="cp_entry">
+            CONSTANT_String_info(string_index=55
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">pt2 = </span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="18"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=2
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=44
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=56
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=79
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">setDebug</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=80
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Z)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="19"><span class="cp_entry">
+            CONSTANT_String_info(string_index=57
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Distance from </span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="20"><span class="cp_entry">
+            CONSTANT_String_info(string_index=58
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value"> to </span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="21"><span class="cp_entry">
+            CONSTANT_String_info(string_index=59
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value"> is </span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="22"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=2
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=44
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=60
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=81
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">distanceFrom</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=82
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(LPoint2d;)D</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="23"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=5
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=47
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/StringBuilder</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=61
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=70
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">append</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=83
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(D)Ljava/lang/StringBuilder;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="24"><span class="cp_entry">
+            CONSTANT_String_info(string_index=62
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value"> to the origin (0, 0) is </span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="25"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=2
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=44
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=63
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=84
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">distanceFromOrigin</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=85
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()D</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="26"><span class="cp_entry">
+            CONSTANT_Double_info(
+            <span class="constant_value">5.0d</span>
+            )
+        </span></li><li value="28"><div class="cp_entry">
+            CONSTANT_Methodref_info
+            (<div class="cp_ref">
+                 class_index=2
+                 &laquo;
+                 <span class="cp_entry">
+            CONSTANT_Class_info(name_index=44
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></span>
+            &raquo;)
+        </span>
+                 &raquo;
+             </div>
+            <div class="cp_ref">
+                name_and_type_index=64
+                &laquo;
+                <div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=86
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">setXY</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=78
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(DD)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="29"><span class="cp_entry">
+            CONSTANT_Double_info(
+            <span class="constant_value">-3.0d</span>
+            )
+        </span></li><li value="31"><span class="cp_entry">
+            CONSTANT_Double_info(
+            <span class="constant_value">-5.0d</span>
+            )
+        </span></li><li value="33"><span class="cp_entry">
+            CONSTANT_Class_info(name_index=65
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">PointTester</span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="34"><span class="cp_entry">
+            CONSTANT_Class_info(name_index=66
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/Object</span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="35"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">&lt;init&gt;</span>&quot;)</span></li><li value="36"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()V</span>&quot;)</span></li><li value="37"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Code</span>&quot;)</span></li><li value="38"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">LineNumberTable</span>&quot;)</span></li><li value="39"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">main</span>&quot;)</span></li><li value="40"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">([Ljava/lang/String;)V</span>&quot;)</span></li><li value="41"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">SourceFile</span>&quot;)</span></li><li value="42"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">PointTester.java</span>&quot;)</span></li><li value="43"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=35
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">&lt;init&gt;</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=36
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="44"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Point2d</span>&quot;)</span></li><li value="45"><span class="cp_entry">
+            CONSTANT_Class_info(name_index=67
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/System</span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="46"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=68
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">out</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=69
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Ljava/io/PrintStream;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="47"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/StringBuilder</span>&quot;)</span></li><li value="48"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">pt1 = </span>&quot;)</span></li><li value="49"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=70
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">append</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=71
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/String;)Ljava/lang/StringBuilder;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="50"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=70
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">append</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=72
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/Object;)Ljava/lang/StringBuilder;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="51"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=73
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">toString</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=74
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()Ljava/lang/String;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="52"><span class="cp_entry">
+            CONSTANT_Class_info(name_index=75
+            &laquo;
+            <span class="cp_ref"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/io/PrintStream</span>&quot;)</span></span>
+            &raquo;)
+        </span></li><li value="53"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=76
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">println</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=77
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/String;)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="54"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=35
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">&lt;init&gt;</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=78
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(DD)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="55"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">pt2 = </span>&quot;)</span></li><li value="56"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=79
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">setDebug</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=80
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Z)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="57"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Distance from </span>&quot;)</span></li><li value="58"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value"> to </span>&quot;)</span></li><li value="59"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value"> is </span>&quot;)</span></li><li value="60"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=81
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">distanceFrom</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=82
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(LPoint2d;)D</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="61"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=70
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">append</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=83
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(D)Ljava/lang/StringBuilder;</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="62"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value"> to the origin (0, 0) is </span>&quot;)</span></li><li value="63"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=84
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">distanceFromOrigin</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=85
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()D</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="64"><div class="cp_entry">
+            CONSTANT_NameAndType_info
+            (
+            <div class="cp_ref">
+                name_index=86
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">setXY</span>&quot;)</span>
+                &raquo;
+            </div>
+            <div class="cp_ref">
+                descriptor_index=78
+                &laquo;
+                <span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(DD)V</span>&quot;)</span>
+                &raquo;
+            </div>
+            )
+        </div></li><li value="65"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">PointTester</span>&quot;)</span></li><li value="66"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/Object</span>&quot;)</span></li><li value="67"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/lang/System</span>&quot;)</span></li><li value="68"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">out</span>&quot;)</span></li><li value="69"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">Ljava/io/PrintStream;</span>&quot;)</span></li><li value="70"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">append</span>&quot;)</span></li><li value="71"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/String;)Ljava/lang/StringBuilder;</span>&quot;)</span></li><li value="72"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/Object;)Ljava/lang/StringBuilder;</span>&quot;)</span></li><li value="73"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">toString</span>&quot;)</span></li><li value="74"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()Ljava/lang/String;</span>&quot;)</span></li><li value="75"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">java/io/PrintStream</span>&quot;)</span></li><li value="76"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">println</span>&quot;)</span></li><li value="77"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Ljava/lang/String;)V</span>&quot;)</span></li><li value="78"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(DD)V</span>&quot;)</span></li><li value="79"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">setDebug</span>&quot;)</span></li><li value="80"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(Z)V</span>&quot;)</span></li><li value="81"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">distanceFrom</span>&quot;)</span></li><li value="82"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(LPoint2d;)D</span>&quot;)</span></li><li value="83"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">(D)Ljava/lang/StringBuilder;</span>&quot;)</span></li><li value="84"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">distanceFromOrigin</span>&quot;)</span></li><li value="85"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">()D</span>&quot;)</span></li><li value="86"><span class="cp_entry">CONSTANT_Utf8_info(&quot;<span class="constant_value">setXY</span>&quot;)</span></li></ol>
+                    </details>
+                </div>
+                <div class="members">
+                    <div class="attributes">
+                        <details>
+                            <summary>Attributes</summary>
+                            <div class="simple_attribute">
+            <span class="attribute_name">SourceFile</span>
+            -
+            PointTester.java
+        </div>
+                        </details>
+                    </div>
+                    <div class="fields">
+                        <details>
+                            <summary>Fields</summary>
+                            
+                        </details>
+                    </div>
+                    <div class="methods">
+                        <details>
+                            <summary>Methods</summary>
+                            <details class="filter_settings" open="true">
+            <summary>Filter</summary>
+            <fieldset>
+                <input type="radio" id="access_flag_private" name="visibility" value="private" onclick="toogleFilter();"></input><label for="access_flag_private">private</label>
+                <input type="radio" id="access_flag_default" name="visibility" value="default" onclick="toogleFilter();"></input><label for="access_flag_default">&lt;default&gt;</label>
+                <input type="radio" id="access_flag_protected" name="visibility" value="protected" onclick="toogleFilter();"></input><label for="access_flag_protected">protected</label>
+                <input type="radio" id="access_flag_public" name="visibility" value="public" onclick="toogleFilter();"></input><label for="access_flag_public">public</label>
+            </fieldset>
+            <fieldset>
+                <input type="radio" id="access_flag_final" name="final_or_abstract" value="final" onclick="toogleFilter();"></input><label for="access_flag_final">final</label>
+                <input type="radio" id="access_flag_abstract" name="final_or_abstract" value="abstract" onclick="toogleFilter();"></input><label for="access_flag_abstract">abstract</label>
+            </fieldset>
+            <div class="java_flags">
+                <input type="checkbox" id="access_flag_static" name="static" value="static" onclick="toogleFilter();"></input><label for="access_flag_static">static</label>
+                <input type="checkbox" id="access_flag_strict" value="strict" onclick="toogleFilter();"></input><label for="access_flag_strict">strict</label>
+                <input type="checkbox" id="access_flag_native" value="native" onclick="toogleFilter();"></input><label for="access_flag_native">native</label>
+                <input type="checkbox" id="access_flag_synchronized" value="synchronized" onclick="toogleFilter();"></input><label for="access_flag_synchronized">synchronized</label>
+            </div>
+            <div class="jvm_flags">
+                <input type="checkbox" id="jvm_modifier_bridge" value="bridge" onclick="toogleFilter();"></input><label for="jvm_modifier_bridge">bridge</label>
+                <input type="checkbox" id="jvm_modifier_varargs" value="varargs" onclick="toogleFilter();"></input><label for="jvm_modifier_varargs">varargs</label>
+            </div>
+            <div class="name_filter">
+                <label for="filter_by_method_name">Name:</label><input id="filter_by_method_name" type="text" title="filter by method name" onkeyup="toogleFilter();"></input>
+            </div>
+            <button value="clear" onclick="clearFilter();">clear</button>
+        </details>
+                            <div class="method" id="&lt;init&gt;()V" data-name="&lt;init&gt;" data-index="0" data-access-flags="default">
+            <div class="method_signature">
+                <span class="access_flags"></span>
+                <span>void &lt;init&gt;()</span>
+            </div>
+            <details class="method_body">
+            <summary>Method Body (Size: 5 bytes, Max Stack: 1, Max Locals: 1)</summary>
+            <table class="method_bytecode">
+            <tr>
+                <th class="pc">PC</th>
+                <th class="line">Line</th>
+                <th>Instruction</th>
+                
+            </tr>
+            <tr>
+            <td class="pc" id="m0_pc0">0</td>
+            <td class="line">4</td>
+            <td> <span class="instruction aload_0">aload_0</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m0_pc1">1</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.Object</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m0_pc4">4</td>
+            <td class="line">|</td>
+            <td> <span class="instruction return">return</span></td>
+            
+        </tr>
+        </table>
+            <div></div>
+            <details>
+            <summary>LineNumberTable</summary>
+            <div>start_pc: 0, line_number: 4</div>
+        </details>
+        </details>
+        </div><div class="method" id="main([Ljava/lang/String;)V" data-name="main" data-index="1" data-access-flags="public static">
+            <div class="method_signature">
+                <span class="access_flags">public static</span>
+                <span>void main(java.lang.String[])</span>
+            </div>
+            <details class="method_body">
+            <summary>Method Body (Size: 489 bytes, Max Stack: 6, Max Locals: 3)</summary>
+            <table class="method_bytecode">
+            <tr>
+                <th class="pc">PC</th>
+                <th class="line">Line</th>
+                <th>Instruction</th>
+                
+            </tr>
+            <tr>
+            <td class="pc" id="m1_pc0">0</td>
+            <td class="line">6</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">Point2d</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc3">3</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc4">4</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc7">7</td>
+            <td class="line">|</td>
+            <td> <span class="instruction astore_1">astore_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc8">8</td>
+            <td class="line">8</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc11">11</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc14">14</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc15">15</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc18">18</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;pt1 = &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc20">20</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc23">23</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc24">24</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc27">27</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc30">30</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc33">33</td>
+            <td class="line">10</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">Point2d</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc36">36</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc37">37</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc2_w">ldc2_w </span>
+                        <span class="constant_value"><span class="contant_value">4.0d</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc40">40</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc2_w">ldc2_w </span>
+                        <span class="constant_value"><span class="contant_value">3.0d</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc43">43</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span><span class="method_parametertype fqn">, double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc46">46</td>
+            <td class="line">|</td>
+            <td> <span class="instruction astore_2">astore_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc47">47</td>
+            <td class="line">12</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc50">50</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc53">53</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc54">54</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc57">57</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;pt2 = &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc59">59</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc62">62</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc63">63</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc66">66</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc69">69</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc72">72</td>
+            <td class="line">14</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc73">73</td>
+            <td class="line">|</td>
+            <td> <span class="instruction iconst_1">iconst_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc74">74</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">setDebug</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">boolean</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc77">77</td>
+            <td class="line">17</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc80">80</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc83">83</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc84">84</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc87">87</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc89">89</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc92">92</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc93">93</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc96">96</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc98">98</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc101">101</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc102">102</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc105">105</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc107">107</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc110">110</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc111">111</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc112">112</td>
+            <td class="line">18</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFrom</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">Point2d</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc115">115</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc118">118</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc121">121</td>
+            <td class="line">17</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc124">124</td>
+            <td class="line">20</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc127">127</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc130">130</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc131">131</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc134">134</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc136">136</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc139">139</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc140">140</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc143">143</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc145">145</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc148">148</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc149">149</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc152">152</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc154">154</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc157">157</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc158">158</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc159">159</td>
+            <td class="line">21</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFrom</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">Point2d</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc162">162</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc165">165</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc168">168</td>
+            <td class="line">20</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc171">171</td>
+            <td class="line">23</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc174">174</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc177">177</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc178">178</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc181">181</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc183">183</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc186">186</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc187">187</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc190">190</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to the origin (0, 0) is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc192">192</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc195">195</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc196">196</td>
+            <td class="line">24</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFromOrigin</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc199">199</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc202">202</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc205">205</td>
+            <td class="line">23</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc208">208</td>
+            <td class="line">26</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc211">211</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc214">214</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc215">215</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc218">218</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc220">220</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc223">223</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc224">224</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc227">227</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to the origin (0, 0) is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc229">229</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc232">232</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc233">233</td>
+            <td class="line">27</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFromOrigin</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc236">236</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc239">239</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc242">242</td>
+            <td class="line">26</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc245">245</td>
+            <td class="line">29</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc246">246</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc2_w">ldc2_w </span>
+                        <span class="constant_value"><span class="contant_value">3.0d</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc249">249</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc2_w">ldc2_w </span>
+                        <span class="constant_value"><span class="contant_value">5.0d</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc252">252</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">setXY</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span><span class="method_parametertype fqn">, double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc255">255</td>
+            <td class="line">30</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc258">258</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc261">261</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc262">262</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc265">265</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;pt1 = &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc267">267</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc270">270</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc271">271</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc274">274</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc277">277</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc280">280</td>
+            <td class="line">32</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc281">281</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc2_w">ldc2_w </span>
+                        <span class="constant_value"><span class="contant_value">-3.0d</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc284">284</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc2_w">ldc2_w </span>
+                        <span class="constant_value"><span class="contant_value">-5.0d</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc287">287</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">setXY</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span><span class="method_parametertype fqn">, double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc290">290</td>
+            <td class="line">33</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc293">293</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc296">296</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc297">297</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc300">300</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;pt2 = &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc302">302</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc305">305</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc306">306</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc309">309</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc312">312</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc315">315</td>
+            <td class="line">35</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc318">318</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc321">321</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc322">322</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc325">325</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc327">327</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc330">330</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc331">331</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc334">334</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc336">336</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc339">339</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc340">340</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc343">343</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc345">345</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc348">348</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc349">349</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc350">350</td>
+            <td class="line">36</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFrom</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">Point2d</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc353">353</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc356">356</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc359">359</td>
+            <td class="line">35</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc362">362</td>
+            <td class="line">38</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc365">365</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc368">368</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc369">369</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc372">372</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc374">374</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc377">377</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc378">378</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc381">381</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc383">383</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc386">386</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc387">387</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc390">390</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc392">392</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc395">395</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc396">396</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc397">397</td>
+            <td class="line">39</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFrom</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">Point2d</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc400">400</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc403">403</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc406">406</td>
+            <td class="line">38</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc409">409</td>
+            <td class="line">41</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc410">410</td>
+            <td class="line">|</td>
+            <td> <span class="instruction iconst_0">iconst_0</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc411">411</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">setDebug</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">boolean</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc414">414</td>
+            <td class="line">44</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc417">417</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc420">420</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc421">421</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc424">424</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc426">426</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc429">429</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc430">430</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc433">433</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to the origin (0, 0) is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc435">435</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc438">438</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_1">aload_1</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc439">439</td>
+            <td class="line">45</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFromOrigin</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc442">442</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc445">445</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc448">448</td>
+            <td class="line">44</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc451">451</td>
+            <td class="line">47</td>
+            <td> <span>
+                        <span class="instruction getstatic">getstatic </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.System</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="fqn">java.io.PrintStream </span><span class="identifier">out </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc454">454</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction new">new </span>
+                        <span class="type_parameter fqn">java.lang.StringBuilder</span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc457">457</td>
+            <td class="line">|</td>
+            <td> <span class="instruction dup">dup</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc458">458</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokespecial">invokespecial </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">&lt;init&gt;</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc461">461</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot;Distance from &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc463">463</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc466">466</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc467">467</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.Object</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc470">470</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction ldc">ldc </span>
+                        <span class="constant_value"><span class="constant_value">&quot; to the origin (0, 0) is &quot;</span></span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc472">472</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc475">475</td>
+            <td class="line">|</td>
+            <td> <span class="instruction aload_2">aload_2</span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc476">476</td>
+            <td class="line">48</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">Point2d</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">double</span>
+            &nbsp;
+            <span class="method_name">distanceFromOrigin</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc479">479</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.StringBuilder</span>
+            &nbsp;
+            <span class="method_name">append</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">double</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc482">482</td>
+            <td class="line">|</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.lang.StringBuilder</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">java.lang.String</span>
+            &nbsp;
+            <span class="method_name">toString</span>
+            <span class="method_parametertypes">()</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc485">485</td>
+            <td class="line">47</td>
+            <td> <span>
+                        <span class="instruction invokevirtual">invokevirtual </span>
+                        <span class="cp_string">
+            <span class="fqn">java.io.PrintStream</span>
+            <span>{ <span class="cp_name_and_type">
+            <span class="cp_method">
+            <span class="method_returntype fqn">void</span>
+            &nbsp;
+            <span class="method_name">println</span>
+            <span class="method_parametertypes">(<span class="method_parametertype fqn">java.lang.String</span>)</span>
+        </span>
+        </span> }</span>
+        </span>
+                    </span></td>
+            
+        </tr><tr>
+            <td class="pc" id="m1_pc488">488</td>
+            <td class="line">50</td>
+            <td> <span class="instruction return">return</span></td>
+            
+        </tr>
+        </table>
+            <div></div>
+            <details>
+            <summary>LineNumberTable</summary>
+            <div>start_pc: 0, line_number: 6</div><div>start_pc: 8, line_number: 8</div><div>start_pc: 33, line_number: 10</div><div>start_pc: 47, line_number: 12</div><div>start_pc: 72, line_number: 14</div><div>start_pc: 77, line_number: 17</div><div>start_pc: 112, line_number: 18</div><div>start_pc: 121, line_number: 17</div><div>start_pc: 124, line_number: 20</div><div>start_pc: 159, line_number: 21</div><div>start_pc: 168, line_number: 20</div><div>start_pc: 171, line_number: 23</div><div>start_pc: 196, line_number: 24</div><div>start_pc: 205, line_number: 23</div><div>start_pc: 208, line_number: 26</div><div>start_pc: 233, line_number: 27</div><div>start_pc: 242, line_number: 26</div><div>start_pc: 245, line_number: 29</div><div>start_pc: 255, line_number: 30</div><div>start_pc: 280, line_number: 32</div><div>start_pc: 290, line_number: 33</div><div>start_pc: 315, line_number: 35</div><div>start_pc: 350, line_number: 36</div><div>start_pc: 359, line_number: 35</div><div>start_pc: 362, line_number: 38</div><div>start_pc: 397, line_number: 39</div><div>start_pc: 406, line_number: 38</div><div>start_pc: 409, line_number: 41</div><div>start_pc: 414, line_number: 44</div><div>start_pc: 439, line_number: 45</div><div>start_pc: 448, line_number: 44</div><div>start_pc: 451, line_number: 47</div><div>start_pc: 476, line_number: 48</div><div>start_pc: 485, line_number: 47</div><div>start_pc: 488, line_number: 50</div>
+        </details>
+        </details>
+        </div>
+                        </details>
+                    </div>
+                </div>
+            </body>
+        </html>
