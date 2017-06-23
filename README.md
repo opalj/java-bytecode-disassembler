@@ -6,7 +6,7 @@ For more information on the OPAL project, visit [opal-project.de](http://www.opa
 
 ## Getting Started
 
-Currently you can only install the package manually by downloading/cloning this repository and following the instructions below.
+Install the package from Atom's package installer by searching for Java-Bytecode-Disassembler. Alternatively (or if you want to expand the package), you can install the package manually by downloading/cloning this repository and following the instructions below.
 
 ### Requirements
 
@@ -20,13 +20,19 @@ Clone the repository to your system
 git clone https://github.com/nicolas-mosch/java-bytecode-disassembler
 ```
 
-Install dependencies (from project's folder)
+Move into the project's folder
+
+```
+cd java-bytecode-disassembler
+```
+
+Install dependencies
 
 ```
 apm install
 ```
 
-Link to Atom's packages (from project's folder)
+Link to Atom's packages
 
 ```
 apm link
@@ -34,7 +40,7 @@ apm link
 
 ### Usage
 
-To use the package simply right-click on a .class file in the tree-view and click on Opal-Disassemble. This should open a new tab with the disassembled view.
+To use the package simply right-click on a .class file in the tree-view and click on Opal-Disassemble. This should open a new tab with the disassembled view. In the settings you can select whether you want to open .class files with the disassembler by default.
 
 ## Authors
 
