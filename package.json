@@ -4,12 +4,17 @@
   "version": "0.0.0",
   "description": "Easily disassemble your java bytecode with the OPAL Java Bytecode Disassembler for a one-to-one representation of the class file.",
   "keywords": [],
-  "repository": "https://github.com/nicolas-mosch/java-bytecode-disassembler.git",
+  "repository": "https://github.com/nicolas-mosch/java-bytecode-disassembler",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
     "jquery": "^3.2.1"
-  }
+  },
+  "author": "Nicolas Morew",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nicolas-mosch/java-bytecode-disassembler/issues"
+  },
 }
