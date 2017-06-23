@@ -1,4 +1,4 @@
-# opal-atom
+# Java Bytecode Disassembler
 
 A package for the Atom editor which enables you to easily run the OPAL Java Bytecode Disassembler on your java bytecode for a one-to-one representation of the class file directly from the Atom editor.
 
@@ -17,7 +17,7 @@ Make sure you have the latest version of Atom installed. The plugin has been tes
 Clone the repository to your system
 
 ```
-git clone https://github.com/nicolas-mosch/opal-atom.git
+git clone https://github.com/nicolas-mosch/java-bytecode-disassembler
 ```
 
 Install dependencies (from project's folder)

@@ -3,7 +3,7 @@
     ".tree-view .file": [
       {
         "label": "Opal-Disassemble",
-        "command": "opal-atom:disassemble"
+        "command": "java-bytecode-disassembler:disassemble"
       }
     ]
   },
@@ -16,7 +16,7 @@
           "submenu": [
             {
               "label": "Settings",
-              "command": "opal-atom:settings"
+              "command": "java-bytecode-disassembler:settings"
             }
           ]
         }

@@ -1,5 +1,0 @@
-{
-  ".tree-view .name": {
-    "click": "opal-atom:tryToDisassemble"
-  }
-}
