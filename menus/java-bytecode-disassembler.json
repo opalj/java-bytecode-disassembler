@@ -6,21 +6,5 @@
         "command": "java-bytecode-disassembler:disassemble"
       }
     ]
-  },
-  "menu": [
-    {
-      "label": "Packages",
-      "submenu": [
-        {
-          "label": "Java Bytecode Disassembler",
-          "submenu": [
-            {
-              "label": "Settings",
-              "command": "java-bytecode-disassembler:settings"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  }
 }
