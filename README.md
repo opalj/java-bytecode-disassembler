@@ -6,13 +6,13 @@ For more information on the OPAL project, visit [opal-project.de](http://www.opa
 
 ## Getting Started
 
-Install the package from Atom's package installer by searching for Java-Bytecode-Disassembler. Alternatively (or if you want to expand the package), you can install the package manually by downloading/cloning this repository and following the instructions below.
+Install the package from Atom's package installer by searching for Java-Bytecode-Disassembler. Alternatively (or if you want to work/expand on the package), you can install the package manually by downloading/cloning this repository and following the instructions below.
 
 ### Requirements
 
 Make sure you have the latest version of Atom installed. The plugin has been tested with version 1.18.0
 
-### Installing
+### Manual Installation
 
 Clone the repository to your system
 
@@ -48,4 +48,4 @@ To use the package simply right-click on a .class file in the tree-view and clic
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the BSD 2-Clause License - see the [LICENSE.md](LICENSE.md) file for details

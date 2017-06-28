@@ -9,131 +9,131 @@
   background-color: lighten(@base-background-color, 2%);
   color: @text-color;
   overflow: auto;
-}
 
-.java-bytecode-disassembler #class_file {
-   background-color: @panel-heading-background-color;
-   border-color: @panel-heading-border-color;
-   size: calc(@font-size + 5px);
-	padding: 1em 1em 1em 1em;
-}
+  #class_file {
+     background-color: @panel-heading-background-color;
+     border-color: @panel-heading-border-color;
+     size: calc(@font-size + 5px);
+  	padding: 1em 1em 1em 1em;
+  }
 
-#defining_class, .fqn, .name, .type{
-   color: @syntax-color-class;
-}
+  #defining_class, .fqn, .name, .type{
+     color: @syntax-color-class;
+  }
 
-div.constant_pool, div.members > div{
-   padding: 8px;
-   border: 1px solid @panel-heading-border-color;
-}
+  div.constant_pool, div.members > div{
+     padding: 8px;
+     border: 1px solid @panel-heading-border-color;
+  }
 
-details[open] summary {
-   padding: 10px;
-   background-color: @panel-heading-background-color;
-   border-color: @panel-heading-border-color;
-   cursor: pointer;
-   border-top-right-radius: 5px;
-   border-top-left-radius: 5px;
-}
+  details[open] summary {
+     padding: 10px;
+     background-color: @panel-heading-background-color;
+     border-color: @panel-heading-border-color;
+     cursor: pointer;
+     border-top-right-radius: 5px;
+     border-top-left-radius: 5px;
+  }
 
-details:not([open]) summary {
-   padding: 10px;
-   background-color: @panel-heading-background-color;
-   border-color: @panel-heading-border-color;
-   cursor: pointer;
-   border-radius: 5px;
-}
+  details:not([open]) summary {
+     padding: 10px;
+     background-color: @panel-heading-background-color;
+     border-color: @panel-heading-border-color;
+     cursor: pointer;
+     border-radius: 5px;
+  }
 
-details{
-   background-color: @inset-panel-background-color;
-}
+  details{
+     background-color: @inset-panel-background-color;
+  }
 
-details[open] {
-   border: 1px solid @inset-panel-border-color;
-   border-top-right-radius: 5px;
-   border-top-left-radius: 5px;
-   padding-bottom: 10px;
-}
+  details[open] {
+     border: 1px solid @inset-panel-border-color;
+     border-top-right-radius: 5px;
+     border-top-left-radius: 5px;
+     padding-bottom: 10px;
+  }
 
-details[open] > *:not(summary){
-   margin-left: 15px;
-}
+  details[open] > *:not(summary){
+     margin-left: 15px;
+  }
 
-.cp_entries li{
-   margin: 5px;
-   &:hover{
-      background-color: @background-color-highlight;
-   }
-   color: @syntax-color-tag;
-   border-radius: 3px;
-}
+  .cp_entries li{
+     margin: 5px;
+     &:hover{
+        background-color: @background-color-highlight;
+     }
+     color: @syntax-color-tag;
+     border-radius: 3px;
+  }
 
-.cp_ref{
-   margin-left: 15px;
-   color: @syntax-text-color;
-}
+  .cp_ref{
+     margin-left: 15px;
+     color: @syntax-text-color;
+  }
 
-.cp_entry{
-   margin-left: 15px;
-   display: block;
-}
+  .cp_entry{
+     margin-left: 15px;
+     display: block;
+  }
 
-.access_flags{
-   color: @syntax-color-keyword;
-}
+  .access_flags{
+     color: @syntax-color-keyword;
+  }
 
-.method_bytecode tr:hover{
-   background-color: @background-color-highlight;
-}
+  .method_bytecode tr:hover{
+     background-color: @background-color-highlight;
+  }
 
-.method_bytecode td{
-   padding: 1px;
-}
+  .method_bytecode td{
+     padding: 1px;
+  }
 
-.method_bytecode td:first-child{
-   border-top-left-radius: 3px;
-   border-bottom-left-radius: 3px;
-}
+  .method_bytecode td:first-child{
+     border-top-left-radius: 3px;
+     border-bottom-left-radius: 3px;
+  }
 
-.method_bytecode td:last-child{
-   border-top-right-radius: 3px;
-   border-bottom-right-radius: 3px;
-}
+  .method_bytecode td:last-child{
+     border-top-right-radius: 3px;
+     border-bottom-right-radius: 3px;
+  }
 
-.pc{
-   color: @syntax-color-modified;
-   width: 30px;
-}
+  .pc{
+     color: @syntax-color-modified;
+     width: 30px;
+  }
 
-.line{
-   color: @syntax-color-added;
-   width: 30px;
-}
+  .line{
+     color: @syntax-color-added;
+     width: 30px;
+  }
 
-span.instruction{
-   color: @syntax-color-renamed;
-   font-style:italic;
-   display: inline-block;
-   width: 112px;
-}
+  span.instruction{
+     color: @syntax-color-renamed;
+     font-style:italic;
+     display: inline-block;
+     width: 112px;
+  }
 
-.cp_name_and_type .identifier{
-   color: @syntax-color-variable;
-}
+  .cp_name_and_type .identifier{
+     color: @syntax-color-variable;
+  }
 
-.filter_settings{
-   background-color: @tool-panel-background-color;
-}
+  .filter_settings{
+     background-color: @tool-panel-background-color;
+  }
 
-.method_signature{
-   margin-top: 10px;
-   font-weight: bold;
-}
+  .method_signature{
+     margin-top: 10px;
+     font-weight: bold;
+  }
 
-.method_name{
-   color: @syntax-color-method;
-}
+  .method_name{
+     color: @syntax-color-method;
+  }
 
-.attribute_name{
-   color: @syntax-color-attribute;
+  .attribute_name{
+     color: @syntax-color-attribute;
+  }
 }
