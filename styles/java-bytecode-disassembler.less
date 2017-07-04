@@ -8,7 +8,6 @@
 .java-bytecode-disassembler {
 	background-color: lighten(@base-background-color, 2%);
 	color: @text-color;
-	overflow: auto;
 
 	#class_file_header {
 		background-color: @panel-heading-background-color;
@@ -17,11 +16,22 @@
 		padding: 1em;
 	}
 
+	.class_file{
+		height: 100%;
+		width: 100%;
+		overflow: auto;
+	}
+
 	#defining_class,
-	.fqn,
+	.interface,
 	.name,
 	.type {
 		color: @syntax-color-class;
+		font-weight: bold;
+	}
+
+	.fqn {
+		color: @syntax-color-variable;
 	}
 
 	div.constant_pool,
@@ -125,10 +135,6 @@
 		color: @syntax-color-variable;
 	}
 
-	.filter_settings {
-		background-color: @tool-panel-background-color;
-	}
-
 	.method_signature {
 		margin-top: 10px;
 		font-weight: bold;
@@ -142,11 +148,51 @@
 		color: @syntax-color-attribute;
 	}
 
-	.fqn {
-		cursor: pointer;
+	.extends,
+	.implements {
+		color: @syntax-color-import;
 	}
 
-	.fqn:hover {
-		color: @syntax-selection-color;
+	#disassembled-view-map-panel {
+		ul {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		ul:not(#disassembled-view-map-tree){
+			margin-left: 2em;
+		}
+
+		.handle{
+			cursor: pointer;
+		}
+
+		.handle.collapsed::before{
+			content: "►";
+			margin-right: 5px;
+		}
+
+		.handle.expanded::before{
+			content: "▼";
+			margin-right: 5px;
+		}
+
+		.map-element:hover{
+			background-color: @background-color-highlight;
+			cursor: crosshair;
+		}
+
+		position: absolute;
+		top: 0px;
+		right: 10px;
+		z-index: 50;
+		background-color: @tool-panel-background-color;
+		border-radius: 5px;
+		padding: 5px;
+	}
+
+	.highlighted {
+		background-color: @syntax-selection-flash-color;
 	}
 }
