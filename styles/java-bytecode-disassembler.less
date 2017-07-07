@@ -12,8 +12,8 @@
 	#class_file_header {
 		background-color: @panel-heading-background-color;
 		border-color: @panel-heading-border-color;
-		size: calc(@font-size + 5px);
 		padding: 1em;
+		font-size: calc(@font-size + 3px);
 	}
 
 	.class_file{
@@ -59,6 +59,10 @@
 
 	details {
 		background-color: @inset-panel-background-color;
+	}
+
+	summary{
+		font-size: calc(@font-size + 2px);
 	}
 
 	details[open] {
@@ -184,12 +188,12 @@
 		}
 
 		position: absolute;
-		top: 0px;
+		top: 10px;
 		right: 10px;
 		z-index: 50;
 		background-color: @tool-panel-background-color;
 		border-radius: 5px;
-		padding: 5px;
+		padding: 8px;
 	}
 
 	.highlighted {
