@@ -22,16 +22,19 @@
 		overflow: auto;
 	}
 
-	#defining_class,
+	#defined_class,
 	.interface,
 	.name,
-	.type {
+	.type,
+	.field_type,
+	.object_type {
 		color: @syntax-color-class;
 		font-weight: bold;
 	}
 
-	.fqn {
-		color: @syntax-color-variable;
+	.object_type:hover{
+		color: @syntax-selection-color;
+		cursor: pointer;
 	}
 
 	div.constant_pool,
@@ -59,6 +62,7 @@
 
 	details {
 		background-color: @inset-panel-background-color;
+		margin-top: 5px;
 	}
 
 	summary{
@@ -157,15 +161,28 @@
 		color: @syntax-color-import;
 	}
 
+	.method_signature{
+		.name{
+			color: @syntax-color-method;
+		}
+
+		.return, .parameter{
+			color: @syntax-color-class;
+		}
+	}
+
 	#disassembled-view-map-panel {
 		ul {
 			list-style-type: none;
 			padding: 0;
 			margin: 0;
+			opacity: 1;
 		}
 
 		ul:not(#disassembled-view-map-tree){
 			margin-left: 2em;
+			max-height: 250px;
+			overflow-y: auto;
 		}
 
 		.handle{
@@ -182,6 +199,13 @@
 			margin-right: 5px;
 		}
 
+		.map-element{
+			width: 100%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
 		.map-element:hover{
 			background-color: @background-color-highlight;
 			cursor: crosshair;
@@ -189,9 +213,10 @@
 
 		position: absolute;
 		top: 10px;
-		right: 10px;
+		right: 15px;
 		z-index: 50;
 		background-color: @tool-panel-background-color;
+		opacity: .7;
 		border-radius: 5px;
 		padding: 8px;
 	}
