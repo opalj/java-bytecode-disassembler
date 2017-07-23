@@ -226,4 +226,67 @@
 	.highlighted {
 		background-color: @syntax-selection-flash-color;
 	}
+
+// Exception stuff
+	td.exception {
+		position: relative;
+	}
+
+	td.exception div {
+		height: 100%;
+		width: 23px;
+		position: absolute;
+		border-radius: 2px;
+		top: 0px;
+	}
+
+	td.exception div.exception {
+		background: rgb(255, 168, 152);
+	}
+
+	td.exception_empty, th.exception_empty, td.exception {
+		background-color: rgb(245, 245, 172)
+	}
+
+	th.exception_header {
+		width: 2em;
+		max-width: 2em;
+	}
+
+	td.exception div.exception_handler{
+		background: #77FD77;
+		z-index: 1;
+		height: 15px;
+	}
+
+	td.exception div.handler_overlap:before {
+		position: absolute;
+		height: 15px;
+		width: 15px;
+		z-index: 2;
+		background: #77FD77;
+		content: " ";
+		border-radius: 2px;
+	}
+
+	td.exception span{
+		-webkit-transform: rotate(90deg) translate(0px, -17px);
+		-webkit-transform-origin: 0% 0%;
+		position: absolute;
+		text-align: center;
+		height: 25px;
+		margin-left: 5px;
+		margin-top: 5px;
+		white-space: nowrap;
+		pointer-events: none;
+		z-index: 3;
+	}
+
+	ol.cp_entries, ol.exception_table {
+		padding-left: 2.5em;
+		padding-top:1em;
+		padding-bottom: 1em;
+		padding-right: 0em;
+	}
+
 }
