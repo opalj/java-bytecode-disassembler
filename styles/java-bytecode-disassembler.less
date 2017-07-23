@@ -44,7 +44,7 @@
 	}
 
 	details[open] summary {
-		padding: 10px;
+		padding: 4px;
 		background-color: @panel-heading-background-color;
 		border-color: @panel-heading-border-color;
 		cursor: pointer;
@@ -53,7 +53,7 @@
 	}
 
 	details:not([open]) summary {
-		padding: 10px;
+		padding: 4px;
 		background-color: @panel-heading-background-color;
 		border-color: @panel-heading-border-color;
 		cursor: pointer;
@@ -65,9 +65,11 @@
 		margin-top: 5px;
 	}
 
-	summary{
+	summary, .method_declaration{
 		font-size: calc(@font-size + 2px);
 	}
+
+
 
 	details[open] {
 		border: 1px solid @inset-panel-border-color;
