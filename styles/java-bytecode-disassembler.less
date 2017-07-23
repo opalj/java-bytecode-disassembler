@@ -37,6 +37,11 @@
 		cursor: pointer;
 	}
 
+	summary .object_type:hover{
+		color: @syntax-color-class !important;
+		cursor: inherit !important;
+	}
+
 	div.constant_pool,
 	div.members > div {
 		padding: 8px;
@@ -112,16 +117,6 @@
 
 	.method_bytecode td {
 		padding: 1px;
-	}
-
-	.method_bytecode td:first-child {
-		border-top-left-radius: 3px;
-		border-bottom-left-radius: 3px;
-	}
-
-	.method_bytecode td:last-child {
-		border-top-right-radius: 3px;
-		border-bottom-right-radius: 3px;
 	}
 
 	.pc {
@@ -236,8 +231,8 @@
 		height: 100%;
 		width: 23px;
 		position: absolute;
-		border-radius: 2px;
 		top: 0px;
+		margin: 2px;
 	}
 
 	td.exception div.exception {
