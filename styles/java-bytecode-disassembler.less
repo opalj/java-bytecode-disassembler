@@ -16,28 +16,28 @@
 		font-size: calc(@font-size + 3px);
 	}
 
-	.class_file{
+	.class_file {
 		height: 100%;
 		width: 100%;
 		overflow: auto;
 	}
 
 	#defined_class,
+	.field_type,
 	.interface,
 	.name,
-	.type,
-	.field_type,
-	.object_type {
+	.object_type,
+	.type {
 		color: @syntax-color-class;
 		font-weight: bold;
 	}
 
-	.object_type:hover{
+	.object_type:hover {
 		color: @syntax-selection-color;
 		cursor: pointer;
 	}
 
-	summary .object_type:hover{
+	summary .object_type:hover {
 		color: @syntax-color-class !important;
 		cursor: inherit !important;
 	}
@@ -70,11 +70,10 @@
 		margin-top: 5px;
 	}
 
-	summary, .method_declaration{
+	.method_declaration,
+	summary {
 		font-size: calc(@font-size + 2px);
 	}
-
-
 
 	details[open] {
 		border: 1px solid @inset-panel-border-color;
@@ -158,12 +157,13 @@
 		color: @syntax-color-import;
 	}
 
-	.method_signature{
-		.name{
+	.method_signature {
+		.name {
 			color: @syntax-color-method;
 		}
 
-		.return, .parameter{
+		.parameter,
+		.return {
 			color: @syntax-color-class;
 		}
 	}
@@ -176,44 +176,43 @@
 			opacity: 1;
 		}
 
-		ul:not(#disassembled-view-map-tree){
+		ul:not(#disassembled-view-map-tree) {
 			margin-left: 2em;
 			max-height: 250px;
 			overflow-y: auto;
 		}
 
-		.handle{
+		.handle {
 			cursor: pointer;
 		}
 
-		.handle.collapsed::before{
+		.handle.collapsed::before {
 			content: "►";
 			margin-right: 5px;
 		}
 
-		.handle.expanded::before{
+		.handle.expanded::before {
 			content: "▼";
 			margin-right: 5px;
 		}
 
-		.map-element{
+		.map-element {
 			width: 100%;
 			overflow: hidden;
 			white-space: nowrap;
 			text-overflow: ellipsis;
 		}
 
-		.map-element:hover{
+		.map-element:hover {
 			background-color: @background-color-highlight;
 			cursor: crosshair;
 		}
-
 		position: absolute;
 		top: 10px;
 		right: 15px;
 		z-index: 50;
 		background-color: @tool-panel-background-color;
-		opacity: .7;
+		opacity: 0.7;
 		border-radius: 5px;
 		padding: 8px;
 	}
@@ -221,8 +220,7 @@
 	.highlighted {
 		background-color: @syntax-selection-flash-color;
 	}
-
-// Exception stuff
+	// Exception stuff
 	td.exception {
 		position: relative;
 	}
@@ -231,7 +229,7 @@
 		height: 100%;
 		width: 23px;
 		position: absolute;
-		top: 0px;
+		top: 0;
 		margin: 2px;
 	}
 
@@ -239,8 +237,10 @@
 		background: rgb(255, 168, 152);
 	}
 
-	td.exception_empty, th.exception_empty, td.exception {
-		background-color: rgb(245, 245, 172)
+	td.exception,
+	td.exception_empty,
+	th.exception_empty {
+		background-color: rgb(245, 245, 172);
 	}
 
 	th.exception_header {
@@ -248,7 +248,7 @@
 		max-width: 2em;
 	}
 
-	td.exception div.exception_handler{
+	td.exception div.exception_handler {
 		background: #77FD77;
 		z-index: 1;
 		height: 15px;
@@ -264,9 +264,9 @@
 		border-radius: 2px;
 	}
 
-	td.exception span{
+	td.exception span {
 		-webkit-transform: rotate(90deg) translate(0px, -17px);
-		-webkit-transform-origin: 0% 0%;
+		-webkit-transform-origin: 0 0;
 		position: absolute;
 		text-align: center;
 		height: 25px;
@@ -277,11 +277,61 @@
 		z-index: 3;
 	}
 
-	ol.cp_entries, ol.exception_table {
-		padding-left: 2.5em;
-		padding-top:1em;
-		padding-bottom: 1em;
-		padding-right: 0em;
+	ol.cp_entries,
+	ol.exception_table {
+		padding: 1em 0 1em 2.5em;
+	}
+	// Progress View
+	#progress-ring {
+		margin: 0 auto;
+		border: 20px solid #f3f3f3;
+		/* Light grey */
+		border-top: 20px solid #3498db;
+		/* Blue */
+		border-radius: 50%;
+		width: 100px;
+		height: 100px;
+		animation: spin 2s linear infinite;
+		margin-bottom: 20px;
+		margin-top: 20px;
 	}
 
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	#progressLabel{
+		text-align: center;
+		color: @text-color;
+		font-weight: bold;
+		font-size: 16;
+	}
+
+	#error-message{
+		margin-top: 10px;
+		text-align: center;
+		color: @text-color-error;
+		font-weight: bold;
+		font-size: 16;
+
+	}
+
+	/*
+	#progress-output{
+		width: 85%;
+		margin: 0 auto;
+		height: 200px;
+		color: @syntax-text-color;
+		background-color: @syntax-background-color;
+		border: 2px solid @tab-border-color;
+		overflow: auto;
+		font-size: 14px;
+	}
+	*/
 }
