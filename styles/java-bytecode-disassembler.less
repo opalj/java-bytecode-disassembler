@@ -223,6 +223,8 @@
 	// Exception stuff
 	td.exception {
 		position: relative;
+		overflow: hidden;
+		width: 27px;
 	}
 
 	td.exception div {
@@ -230,11 +232,12 @@
 		width: 23px;
 		position: absolute;
 		top: 0;
-		margin: 2px;
 	}
 
 	td.exception div.exception {
+		border-radius: 2px;
 		background: rgb(255, 168, 152);
+		margin-left: 1px;
 	}
 
 	td.exception,
@@ -269,9 +272,9 @@
 		-webkit-transform-origin: 0 0;
 		position: absolute;
 		text-align: center;
-		height: 25px;
-		margin-left: 5px;
-		margin-top: 5px;
+		//height: 25px;
+		margin-left: 2px;
+		margin-top: 2px;
 		white-space: nowrap;
 		pointer-events: none;
 		z-index: 3;
