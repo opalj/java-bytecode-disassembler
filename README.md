@@ -42,6 +42,14 @@ apm link
 
 To use the package simply right-click on a .class file in the tree-view and click on Opal-Disassemble. This should open a new tab with the disassembled view. In the settings you can select whether you want to open .class files with the disassembler by default.
 
+### Problems
+
+If you encounter any problems installing the package from the atom package manager, you can try to install it via the command line using the command below.
+
+```
+apm install java-bytecode-disassembler
+```
+
 ## Authors
 
 * **Nicolas Morew**
