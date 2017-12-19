@@ -1,9 +1,13 @@
 {
   "name": "Java-Bytecode-Disassembler",
   "main": "./lib/java-bytecode-disassembler",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Easily disassemble your java bytecode with the OPAL Java Bytecode Disassembler for a one-to-one representation of the class file.",
-  "keywords": ["java", "bytecode", "disassembler"],
+  "keywords": [
+    "java",
+    "bytecode",
+    "disassembler"
+  ],
   "repository": "https://github.com/nicolas-mosch/java-bytecode-disassembler",
   "license": "BSD2",
   "engines": {
