@@ -10,7 +10,7 @@ Install the package from Atom's package installer by searching for Java-Bytecode
 
 ### Requirements
 
-Make sure you have the latest version of Atom installed. The plugin has been tested with version 1.18.0
+Make sure you have the latest version of Atom installed. The plugin has been tested with version 1.27.2
 
 ### Manual Installation
 
@@ -50,9 +50,21 @@ If you encounter any problems installing the package from the atom package manag
 apm install java-bytecode-disassembler
 ```
 
+## Latest Changes
+* v0.8.1 - Fix: Space in jar name doesn't cause error anymore
+* v0.8.0 - Feat: Add support for java-9 and java-10. Fix colours for themes.
+    * Previously, the tool worked only with java-8. Now it also functions
+    with java-9 and 10.
+    Additionally, some theme and colour combinations
+    in Atom didn't work out (i.e. white colour on white background), so
+    some colours were adjusted with the aim to be more easily readable.
+* For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
+
+
 ## Authors
 
 * **Nicolas Morew**
+* **Ruslan Sandler**
 
 ## License
 
