@@ -51,7 +51,8 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
-* v0.8.3 - Feat: Adapt colours to match the syntax theme.
+* v0.9.1 - Doc: Fix README and CHANGELOG to include correct version number
+* v0.9 - Feat: Adapt colours to match the syntax theme.
     * Previously, the syntax-theme in the disassembled view
     had the colours of the dark theme, regardless of the syntax
     theme selected by the user. This has been changed to provide
