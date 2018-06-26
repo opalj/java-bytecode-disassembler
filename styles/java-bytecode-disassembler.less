@@ -10,10 +10,11 @@
 	color: @text-color;
 
 	#class_file_header {
-		background-color: @panel-heading-background-color;
+		background-color: @syntax-background-color;
 		border-color: @panel-heading-border-color;
 		padding: 1em;
 		font-size: calc(@font-size + 3px);
+		color: @syntax-text-color;
 	}
 
 	.class_file {
@@ -28,7 +29,7 @@
 	.name,
 	.object_type,
 	.type {
-		color: @syntax-color-class;
+		color: @syntax-text-color;
 		font-weight: bold;
 	}
 
@@ -50,8 +51,9 @@
 
 	details[open] summary {
 		padding: 4px;
-		background-color: @panel-heading-background-color;
+		background-color: @syntax-background-color;
 		border-color: @panel-heading-border-color;
+		color: @syntax-text-color;
 		cursor: pointer;
 		border-top-right-radius: 5px;
 		border-top-left-radius: 5px;
@@ -59,14 +61,15 @@
 
 	details:not([open]) summary {
 		padding: 4px;
-		background-color: @panel-heading-background-color;
+		background-color: @syntax-background-color;
 		border-color: @panel-heading-border-color;
+		color: @syntax-text-color;
 		cursor: pointer;
 		border-radius: 5px;
 	}
 
 	details {
-		background-color: @inset-panel-background-color;
+		background-color: @syntax-background-color;
 		margin-top: 5px;
 	}
 
@@ -90,7 +93,7 @@
 		margin: 5px;
 
 		&:hover {
-			background-color: @background-color-highlight;
+			background-color: @syntax-gutter-background-color-selected;
 		}
 		color: @syntax-color-tag;
 		border-radius: 3px;
@@ -98,7 +101,7 @@
 
 	.cp_ref {
 		margin-left: 15px;
-		color: @syntax-color-snippet;
+		color: @syntax-text-color;
 	}
 
 	.cp_entry {
@@ -111,7 +114,7 @@
 	}
 
 	.method_bytecode tr:hover {
-		background-color: @background-color-highlight;
+		background-color: @syntax-gutter-background-color-selected;
 	}
 
 	.method_bytecode td {
@@ -211,7 +214,7 @@
 		top: 10px;
 		right: 15px;
 		z-index: 50;
-		background-color: @tool-panel-background-color;
+		background-color: @syntax-background-color;
 		opacity: 0.7;
 		border-radius: 5px;
 		padding: 8px;
