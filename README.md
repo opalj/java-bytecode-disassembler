@@ -51,6 +51,10 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.10.0 - Feat: Add outline-view.
+    * Previously, the information was displayed in a map panel at the top of the
+    disassembled view. This has been moved to an outline-view on the right.
+    The fields are auto-expanded, but can be collapsed if they are clicked.
 * v0.9.1 - Doc: Fix README and CHANGELOG to include correct version number
 * v0.9 - Feat: Adapt colours to match the syntax theme.
     * Previously, the syntax-theme in the disassembled view
@@ -66,12 +70,6 @@ apm install java-bytecode-disassembler
     was too little for some bigger files.
     Additionally, README.md and CHANGELOG.md have been updated.
 * v0.8.1 - Fix: Space in jar name doesn't cause error anymore
-* v0.8.0 - Feat: Add support for java-9 and java-10. Fix colours for themes.
-    * Previously, the tool worked only with java-8. Now it also functions
-    with java-9 and 10.
-    Additionally, some theme and colour combinations
-    in Atom didn't work out (i.e. white colour on white background), so
-    some colours were adjusted with the aim to be more easily readable.
 * For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
 
 

@@ -1,3 +1,9 @@
+## v0.10.0
+* Feat: Add outline-view.
+    * Previously, the information was displayed in a map panel at the top of the
+    disassembled view. This has been moved to an outline-view on the right.
+    The fields are auto-expanded, but can be collapsed if they are clicked.
+
 ## v0.9.1
 * Doc: Fix README and CHANGELOG to include correct version number
 
