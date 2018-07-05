@@ -51,6 +51,11 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.10.1 - Fix: Add scroll-bar, increase text size (outline-view)
+    * Previously, large classes couldn't be viewed in their entirety in the
+    outline-view. This has been fixed by adding a scroll-bar.
+    * The text size in outline-view has been increased to make it more easily
+    readable and to match it the larger space, which the outline-view offers.
 * v0.10.0 - Feat: Add outline-view.
     * Previously, the information was displayed in a map panel at the top of the
     disassembled view. This has been moved to an outline-view on the right.
