@@ -1,3 +1,9 @@
+## v0.12.1
+* Fix: Display 3-Address-Code for methods in bottom dock
+    * 3-Address-Code for methods isn't displayed in a new window anymore.
+    Instead, it is displayed at the bottom of the disassembled view in a
+    separate dock.
+
 ## v0.12.0
 * Feature: Add option to show 3-Address-Code for methods
     * If you right-click a method-name in the disassembled view, you can

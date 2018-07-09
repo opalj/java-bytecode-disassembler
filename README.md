@@ -51,6 +51,10 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.12.1 - Fix: Display 3-Address-Code for methods in bottom dock
+    * 3-Address-Code for methods isn't displayed in a new window anymore.
+    Instead, it is displayed at the bottom of the disassembled view in a
+    separate dock.
 * v0.12.0 - Feature: Add option to show 3-Address-Code for methods
     * If you right-click a method-name in the disassembled view, you can
     display its 3-Address-Code by clicking on "Show 3-Address-Code (Method)"
@@ -68,7 +72,6 @@ apm install java-bytecode-disassembler
     * Previously, the information was displayed in a map panel at the top of the
     disassembled view. This has been moved to an outline-view on the right.
     The fields are auto-expanded, but can be collapsed if they are clicked.
-* v0.9.1 - Doc: Fix README and CHANGELOG to include correct version number
 * For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
 
 
