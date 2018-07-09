@@ -4,6 +4,10 @@
       {
         "label": "Opal-Disassemble",
         "command": "java-bytecode-disassembler:disassemble"
+      },
+      {
+        "label": "Show 3-Address-Code",
+        "command": "java-tac:process-file"
       }
     ]
   }
