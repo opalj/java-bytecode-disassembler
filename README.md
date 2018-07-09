@@ -51,6 +51,11 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.12.0 - Feature: Add option to show 3-Address-Code for methods
+    * If you right-click a method-name in the disassembled view, you can
+    display its 3-Address-Code by clicking on "Show 3-Address-Code (Method)"
+    * Fixed a bug where 3-Address-Code for files with irregular characters
+    wasn't displayed correctly.
 * v0.11.0 - Feature: Add option to show 3-Address-Code to context menu
     * If you right-click a .class file in the file tree, you have the option
     to "Show 3-Address-Code" now.
@@ -64,15 +69,6 @@ apm install java-bytecode-disassembler
     disassembled view. This has been moved to an outline-view on the right.
     The fields are auto-expanded, but can be collapsed if they are clicked.
 * v0.9.1 - Doc: Fix README and CHANGELOG to include correct version number
-* v0.9 - Feat: Adapt colours to match the syntax theme.
-    * Previously, the syntax-theme in the disassembled view
-    had the colours of the dark theme, regardless of the syntax
-    theme selected by the user. This has been changed to provide
-    the user with a more consistent experience.
-    The downside: A light UI theme in combination with a dark syntax
-    theme makes the attribute's inner classes hardly readable.
-    If you use the aforementioned theme combination please change it
-    or open an issue on Github.
 * For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
 
 

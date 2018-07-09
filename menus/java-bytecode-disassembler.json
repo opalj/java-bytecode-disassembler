@@ -9,6 +9,12 @@
         "label": "Show 3-Address-Code",
         "command": "java-tac:process-file"
       }
+    ],
+    "atom-workspace": [
+    	{
+    		"label": "Show 3-Address-Code (Method)",
+    		"command": "java-tac:process-method"
+    	}
     ]
   }
 }

@@ -1,3 +1,10 @@
+## v0.12.0
+* Feature: Add option to show 3-Address-Code for methods
+    * If you right-click a method-name in the disassembled view, you can
+    display its 3-Address-Code by clicking on "Show 3-Address-Code (Method)"
+    * Fixed a bug where 3-Address-Code for files with irregular characters
+    wasn't displayed correctly.
+
 ## v0.11.0
 * Feature: Add option to show 3-Address-Code to context menu
     * If you right-click a .class file in the file tree, you have the option
