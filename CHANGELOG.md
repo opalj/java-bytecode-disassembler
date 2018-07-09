@@ -1,3 +1,8 @@
+## v0.11.0
+* Feature: Add option to show 3-Address-Code to context menu
+    * If you right-click a .class file in the file tree, you have the option
+    to "Show 3-Address-Code" now.
+
 ## v0.10.1
 * Fix: Add scroll-bar, increase text size (outline-view)
     * Previously, large classes couldn't be viewed in their entirety in the

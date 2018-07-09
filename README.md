@@ -51,6 +51,9 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.11.0 - Feature: Add option to show 3-Address-Code to context menu
+    * If you right-click a .class file in the file tree, you have the option
+    to "Show 3-Address-Code" now.
 * v0.10.1 - Fix: Add scroll-bar, increase text size (outline-view)
     * Previously, large classes couldn't be viewed in their entirety in the
     outline-view. This has been fixed by adding a scroll-bar.
@@ -70,11 +73,6 @@ apm install java-bytecode-disassembler
     theme makes the attribute's inner classes hardly readable.
     If you use the aforementioned theme combination please change it
     or open an issue on Github.
-* v0.8.2 - Fix: Increase default stdoutMaxBuffer to 16000
-    * The default stdoutMaxBuffer is increased to 16000 because 4000
-    was too little for some bigger files.
-    Additionally, README.md and CHANGELOG.md have been updated.
-* v0.8.1 - Fix: Space in jar name doesn't cause error anymore
 * For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
 
 
