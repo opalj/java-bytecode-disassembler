@@ -1,3 +1,6 @@
+## v0.12.4
+* Fix: Methods from the JDK can be displayed in 3-Address-Code now
+
 ## v0.12.3
 * Fix: Bug fixes of issues mentioned below
     * 3-Address-Code wasn't displayed for several classes.

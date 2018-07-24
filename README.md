@@ -51,6 +51,7 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.12.4 - Fix: Methods from the JDK can be displayed in 3-Address-Code now
 * v0.12.3 - Fix: Bug fixes of issues mentioned below
     * 3-Address-Code wasn't displayed for several classes.
     * If the jar file had spaces, 3-Address-Code for methods wasn't displayed.
@@ -66,14 +67,6 @@ apm install java-bytecode-disassembler
     display its 3-Address-Code by clicking on "Show 3-Address-Code (Method)"
     * Fixed a bug where 3-Address-Code for files with irregular characters
     wasn't displayed correctly.
-* v0.11.0 - Feature: Add option to show 3-Address-Code to context menu
-    * If you right-click a .class file in the file tree, you have the option
-    to "Show 3-Address-Code" now.
-* v0.10.1 - Fix: Add scroll-bar, increase text size (outline-view)
-    * Previously, large classes couldn't be viewed in their entirety in the
-    outline-view. This has been fixed by adding a scroll-bar.
-    * The text size in outline-view has been increased to make it more easily
-    readable and to match it the larger space, which the outline-view offers.
 * For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
 
 
