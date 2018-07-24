@@ -1,3 +1,8 @@
+## v0.12.2
+* Fix: Display 3-Address-Code for methods inside jars
+    * Fixed a bug which disallowed displaying 3-Address-Code for methods
+    belonging to .class files inside a jar.
+
 ## v0.12.1
 * Fix: Display 3-Address-Code for methods in bottom dock
     * 3-Address-Code for methods isn't displayed in a new window anymore.

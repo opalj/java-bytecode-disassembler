@@ -51,6 +51,9 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.12.2 - Fix: Display 3-Address-Code for methods inside jars
+    * Fixed a bug which disallowed displaying 3-Address-Code for methods
+    belonging to .class files inside a jar.
 * v0.12.1 - Fix: Display 3-Address-Code for methods in bottom dock
     * 3-Address-Code for methods isn't displayed in a new window anymore.
     Instead, it is displayed at the bottom of the disassembled view in a
@@ -68,10 +71,6 @@ apm install java-bytecode-disassembler
     outline-view. This has been fixed by adding a scroll-bar.
     * The text size in outline-view has been increased to make it more easily
     readable and to match it the larger space, which the outline-view offers.
-* v0.10.0 - Feat: Add outline-view.
-    * Previously, the information was displayed in a map panel at the top of the
-    disassembled view. This has been moved to an outline-view on the right.
-    The fields are auto-expanded, but can be collapsed if they are clicked.
 * For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
 
 
