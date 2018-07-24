@@ -1,3 +1,8 @@
+## v0.12.3
+* Fix: Bug fixes of issues mentioned below
+    * 3-Address-Code wasn't displayed for several classes.
+    * If the jar file had spaces, 3-Address-Code for methods wasn't displayed.
+
 ## v0.12.2
 * Fix: Display 3-Address-Code for methods inside jars
     * Fixed a bug which disallowed displaying 3-Address-Code for methods
