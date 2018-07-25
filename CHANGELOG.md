@@ -1,3 +1,8 @@
+# v0.12.5
+* Fix: 3-Address-Code (Methods)
+    * The option is displayed only for .class files now
+    * If the processing fails, a warning is displayed now
+
 ## v0.12.4
 * Fix: Methods from the JDK can be displayed in 3-Address-Code now
 

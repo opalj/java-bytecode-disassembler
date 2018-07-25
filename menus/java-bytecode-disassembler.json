@@ -10,7 +10,7 @@
         "command": "java-tac:process-file"
       }
     ],
-    "atom-workspace": [
+    ".class_file": [
     	{
     		"label": "Show 3-Address-Code (Method)",
     		"command": "java-tac:process-method"
