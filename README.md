@@ -51,6 +51,8 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
+* v0.12.6 - Fix: 3-Address-Code for jars with multiple spaces works now
+    * Previously, if a jar had spaces, only the first space was sanitized.
 * v0.12.5 - Fix: 3-Address-Code (Methods)
     * The option is displayed only for .class files now
     * If the processing fails, a warning is displayed now
