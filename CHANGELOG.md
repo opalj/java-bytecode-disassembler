@@ -1,3 +1,8 @@
+## v0.13.0
+* Upgrade to OPAL 4.0
+    * Allows for disassembling .class files newer than Java 10
+    * Supports bytecode features up to Java 16
+
 ## v0.12.6
 * Fix: 3-Address-Code for jars with multiple spaces works now
     * Previously, if a jar had spaces, only the first space was sanitized.

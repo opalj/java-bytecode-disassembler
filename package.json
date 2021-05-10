@@ -8,7 +8,7 @@
     "bytecode",
     "disassembler"
   ],
-  "repository": "https://github.com/nicolas-mosch/java-bytecode-disassembler",
+  "repository": "https://github.com/opalj/java-bytecode-disassembler",
   "license": "BSD2",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
@@ -18,6 +18,6 @@
   },
   "author": "Nicolas Morew",
   "bugs": {
-    "url": "https://github.com/nicolas-mosch/java-bytecode-disassembler/issues"
+    "url": "https://github.com/opalj/java-bytecode-disassembler/issues"
   }
 }

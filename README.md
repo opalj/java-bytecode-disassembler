@@ -41,6 +41,8 @@ apm link
 ### Usage
 
 To use the package simply right-click on a .class file in the tree-view and click on Opal-Disassemble. This should open a new tab with the disassembled view. In the settings you can select whether you want to open .class files with the disassembler by default.
+You can also view a three-address code representation of an entire class file by clicking Show 3-Address-Code.
+To show the three-address code for a single method, right-click on the method name in a disassembled .class file and select the respective item.
 
 ### Problems
 
@@ -51,23 +53,10 @@ apm install java-bytecode-disassembler
 ```
 
 ## Latest Changes
-* v0.12.6 - Fix: 3-Address-Code for jars with multiple spaces works now
-    * Previously, if a jar had spaces, only the first space was sanitized.
-* v0.12.5 - Fix: 3-Address-Code (Methods)
-    * The option is displayed only for .class files now
-    * If the processing fails, a warning is displayed now
-* v0.12.4 - Fix: Methods from the JDK can be displayed in      3-Address-Code now
-* v0.12.3 - Fix: Bug fixes of issues mentioned below
-    * 3-Address-Code wasn't displayed for several classes.
-    * If the jar file had spaces, 3-Address-Code for methods wasn't displayed.
-* v0.12.2 - Fix: Display 3-Address-Code for methods inside jars
-    * Fixed a bug which disallowed displaying 3-Address-Code for methods
-    belonging to .class files inside a jar.
-* v0.12.1 - Fix: Display 3-Address-Code for methods in bottom dock
-    * 3-Address-Code for methods isn't displayed in a new window anymore.
-    Instead, it is displayed at the bottom of the disassembled view in a
-    separate dock.
-* For a full list see: [CHANGELOG.md](https://github.com/nicolas-mosch/java-bytecode-disassembler/blob/master/CHANGELOG.md)
+* v0.13.0 - Upgrade to OPAL 4.0
+    * Allows for disassembling .class files newer than Java 10
+    * Supports bytecode features up to Java 16
+* For a full list see: [CHANGELOG.md](https://github.com/opalj/java-bytecode-disassembler/blob/master/CHANGELOG.md)
 
 
 ## Authors
